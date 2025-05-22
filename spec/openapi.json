@@ -1,0 +1,383 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "KMS API",
+    "version": "1.0.0",
+    "description": "さくらのクラウド KMS API"
+  },
+  "servers": [
+    {
+      "url": "https://secure.sakura.ad.jp/cloud/zone/is1a/api/cloud/1.1",
+      "description": "石狩第1ゾーン"
+    },
+    {
+      "url": "https://secure.sakura.ad.jp/cloud/zone/is1b/api/cloud/1.1",
+      "description": "石狩第2ゾーン"
+    },
+    {
+      "url": "https://secure.sakura.ad.jp/cloud/zone/tk1a/api/cloud/1.1",
+      "description": "東京第1ゾーン"
+    },
+    {
+      "url": "https://secure.sakura.ad.jp/cloud/zone/tk1b/api/cloud/1.1",
+      "description": "東京第2ゾーン"
+    }
+  ],
+  "paths": {
+    "/kms/keys": {
+      "get": {
+        "operationId": "kms_keys_list",
+        "tags": [
+          "kms-key"
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedKeyList"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      },
+      "post": {
+        "operationId": "kms_keys_create",
+        "tags": [
+          "kms-key"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WrappedCreateKey"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WrappedCreateKey"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/kms/keys/{resource_id}": {
+      "get": {
+        "operationId": "kms_keys_retrieve",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "resource_id",
+            "schema": {
+              "type": "string",
+              "title": "リソースID"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "kms-key"
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WrappedKey"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      },
+      "put": {
+        "operationId": "kms_keys_update",
+        "description": "",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "resource_id",
+            "schema": {
+              "type": "string",
+              "title": "リソースID"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "kms-key"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WrappedKey"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WrappedKey"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      },
+      "delete": {
+        "operationId": "kms_keys_destroy",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "resource_id",
+            "schema": {
+              "type": "string",
+              "title": "リソースID"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "kms-key"
+        ],
+        "responses": {
+          "204": {
+            "description": "No response body"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "APIキーとシークレットをご利用ください"
+      }
+    },
+    "schemas": {
+      "DateTime": {
+        "type": "string",
+        "format": "iso8601",
+        "example": "2025-02-05T12:19:22.551827+09:00"
+      },
+      "AvailabilityEnum": {
+        "enum": [
+          "precreate",
+          "available",
+          "discontinued"
+        ],
+        "type": "string",
+        "description": "* `precreate` - 準備中\n* `available` - 利用可能\n* `discontinued` - 廃止"
+      },
+      "CreateKey": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "readOnly": true,
+            "example": "110000000000"
+          },
+          "CreatedAt": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DateTime"
+              }
+            ],
+            "readOnly": true,
+            "title": "登録日時"
+          },
+          "ModifiedAt": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DateTime"
+              }
+            ],
+            "readOnly": true
+          },
+          "Name": {
+            "type": "string",
+            "title": "名前",
+            "maxLength": 255
+          },
+          "Description": {
+            "type": "string",
+            "title": "説明"
+          },
+          "KeyOrigin": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KeyOriginEnum"
+              }
+            ],
+            "readOnly": true,
+            "title": "鍵の生成元"
+          },
+          "Tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "PlainKey": {
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "CreatedAt",
+          "ID",
+          "KeyOrigin",
+          "ModifiedAt",
+          "Name"
+        ]
+      },
+      "Key": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "readOnly": true,
+            "example": "110000000000"
+          },
+          "CreatedAt": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DateTime"
+              }
+            ],
+            "readOnly": true,
+            "title": "登録日時"
+          },
+          "ModifiedAt": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DateTime"
+              }
+            ],
+            "readOnly": true
+          },
+          "Name": {
+            "type": "string",
+            "title": "名前",
+            "maxLength": 255
+          },
+          "Description": {
+            "type": "string",
+            "title": "説明"
+          },
+          "KeyOrigin": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KeyOriginEnum"
+              }
+            ],
+            "readOnly": true,
+            "title": "鍵の生成元"
+          },
+          "Tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "CreatedAt",
+          "ID",
+          "KeyOrigin",
+          "ModifiedAt",
+          "Name"
+        ]
+      },
+      "KeyOriginEnum": {
+        "enum": [
+          "generated",
+          "imported"
+        ],
+        "type": "string",
+        "description": "* `generated` - 生成\n* `imported` - インポート"
+      },
+      "PaginatedKeyList": {
+        "type": "object",
+        "required": [
+          "Count",
+          "Keys"
+        ],
+        "properties": {
+          "Count": {
+            "type": "integer",
+            "example": 10
+          },
+          "From": {
+            "type": "integer",
+            "example": 0
+          },
+          "Total": {
+            "type": "integer",
+            "example": 10
+          },
+          "Keys": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Key"
+            }
+          }
+        }
+      },
+      "ServiceClassEnum": {
+        "enum": [
+          "cloud/cloudhsm/partition"
+        ],
+        "type": "string",
+        "description": "* `cloud/cloudhsm/partition` - Type-L7"
+      },
+      "WrappedCreateKey": {
+        "type": "object",
+        "properties": {
+          "Key": {
+            "$ref": "#/components/schemas/CreateKey"
+          }
+        },
+        "required": [
+          "Key"
+        ]
+      },
+      "WrappedKey": {
+        "type": "object",
+        "properties": {
+          "Key": {
+            "$ref": "#/components/schemas/Key"
+          }
+        },
+        "required": [
+          "Key"
+        ]
+      }
+    }
+  }
+}
