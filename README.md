@@ -41,7 +41,7 @@ func main() {
 }
 ```
 
-example_test.goも参照。
+[example_test.go](./example_test.go) も参照。
 
 :warning:  v1.0に達するまでは互換性のない形で変更される可能性がありますのでご注意ください。
 
@@ -51,7 +51,7 @@ example_test.goも参照。
 
 ```
 $ go get -tool github.com/ogen-go/ogen/cmd/ogen@latest
-$ go tool ogen -package v1 -target apis/v1 -clean -config ogen-config.yaml ./spec/openapi.json
+$ go tool ogen -package v1 -target apis/v1 -clean -config ogen-config.yaml ./openapi/openapi.json
 ```
 
 ## License
