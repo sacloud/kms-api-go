@@ -41,7 +41,7 @@ func main() {
 }
 ```
 
-[example_test.go](./example_test.go) も参照。
+[keys_test.go](./keys_test.go) も参照。
 
 :warning:  v1.0に達するまでは互換性のない形で変更される可能性がありますのでご注意ください。
 
