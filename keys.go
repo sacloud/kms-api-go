@@ -41,18 +41,16 @@ func NewKeyOp(client *v1.Client) KeyAPI {
 func (op *keyOp) List(ctx context.Context) (v1.Keys, error) {
 	res, err := op.client.KmsKeysList(ctx)
 	if err != nil {
-		return nil, err
+		return nil, NewError("List", err)
 	}
-
 	return res.Keys, nil
 }
 
 func (op *keyOp) Read(ctx context.Context, id string) (*v1.Key, error) {
 	res, err := op.client.KmsKeysRetrieve(ctx, v1.KmsKeysRetrieveParams{ResourceID: id})
 	if err != nil {
-		return nil, err
+		return nil, NewError("Read", err)
 	}
-
 	return &res.Key, nil
 }
 
@@ -61,9 +59,8 @@ func (op *keyOp) Create(ctx context.Context, request v1.CreateKey) (*v1.CreateKe
 		Key: request,
 	})
 	if err != nil {
-		return nil, err
+		return nil, NewError("Create", err)
 	}
-
 	return &res.Key, nil
 }
 
@@ -72,12 +69,15 @@ func (op *keyOp) Update(ctx context.Context, id string, request v1.Key) (*v1.Key
 		Key: request,
 	}, v1.KmsKeysUpdateParams{ResourceID: id})
 	if err != nil {
-		return nil, err
+		return nil, NewError("Update", err)
 	}
-
 	return &res.Key, nil
 }
 
 func (op *keyOp) Delete(ctx context.Context, id string) error {
-	return op.client.KmsKeysDestroy(ctx, v1.KmsKeysDestroyParams{ResourceID: id})
+	err := op.client.KmsKeysDestroy(ctx, v1.KmsKeysDestroyParams{ResourceID: id})
+	if err != nil {
+		return NewError("Delete", err)
+	}
+	return nil
 }
