@@ -52,12 +52,12 @@ func NewClient() (*v1.Client, error) {
 func NewClientWithApiUrl(apiUrl string) (*v1.Client, error) {
 	c, err := client.NewClient(apiUrl, client.WithUserAgent(UserAgent))
 	if err != nil {
-		return nil, err
+		return nil, NewError("NewClientWithApiUrl", err)
 	}
 
 	v1Client, err := v1.NewClient(c.ServerURL(), DummySecuritySource{Username: "", Password: ""}, v1.WithClient(c.NewHttpRequestDoer()))
 	if err != nil {
-		return nil, fmt.Errorf("failed to create kms client: %w", err)
+		return nil, NewError("NewClientWithApiUrl", err)
 	}
 
 	return v1Client, nil
