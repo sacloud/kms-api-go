@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	client "github.com/sacloud/api-client-go"
 	kms "github.com/sacloud/kms-api-go"
 	v1 "github.com/sacloud/kms-api-go/apis/v1"
 	"github.com/sacloud/packages-go/testutil"
@@ -15,7 +16,7 @@ import (
 func TestKeyAPI(t *testing.T) {
 	testutil.PreCheckEnvsFunc("SAKURACLOUD_ACCESS_TOKEN", "SAKURACLOUD_ACCESS_TOKEN_SECRET")(t)
 
-	client, err := kms.NewClient()
+	client, err := kms.NewClient(client.WithDisableProfile(true))
 	require.NoError(t, err, "failed to create client")
 
 	ctx := context.Background()
