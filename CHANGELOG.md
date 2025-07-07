@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.2.2](https://github.com/sacloud/kms-api-go/compare/v0.2.1...v0.2.2) - 2025-07-07
+- NewClient functions accept client parameters by @repeatedly in https://github.com/sacloud/kms-api-go/pull/8
+
 ## [v0.2.1](https://github.com/sacloud/kms-api-go/compare/v0.2.0...v0.2.1) - 2025-07-07
 - Use api-client-go's APIError by @repeatedly in https://github.com/sacloud/kms-api-go/pull/6
 
