@@ -8,9 +8,113 @@ import (
 
 	"github.com/go-faster/errors"
 	"github.com/go-faster/jx"
-
 	"github.com/ogen-go/ogen/validate"
 )
+
+// Encode implements json.Marshaler.
+func (s *ChangeKeyStatus) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *ChangeKeyStatus) encodeFields(e *jx.Encoder) {
+	{
+		if s.Status.Set {
+			e.FieldStart("Status")
+			s.Status.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfChangeKeyStatus = [1]string{
+	0: "Status",
+}
+
+// Decode decodes ChangeKeyStatus from json.
+func (s *ChangeKeyStatus) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ChangeKeyStatus to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "Status":
+			if err := func() error {
+				s.Status.Reset()
+				if err := s.Status.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Status\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode ChangeKeyStatus")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *ChangeKeyStatus) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ChangeKeyStatus) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes ChangeKeyStatusStatus as json.
+func (s ChangeKeyStatusStatus) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes ChangeKeyStatusStatus from json.
+func (s *ChangeKeyStatusStatus) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ChangeKeyStatusStatus to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch ChangeKeyStatusStatus(v) {
+	case ChangeKeyStatusStatusActive:
+		*s = ChangeKeyStatusStatusActive
+	case ChangeKeyStatusStatusRestricted:
+		*s = ChangeKeyStatusStatusRestricted
+	case ChangeKeyStatusStatusSuspended:
+		*s = ChangeKeyStatusStatusSuspended
+	default:
+		*s = ChangeKeyStatusStatus(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s ChangeKeyStatusStatus) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ChangeKeyStatusStatus) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
 
 // Encode implements json.Marshaler.
 func (s *CreateKey) Encode(e *jx.Encoder) {
@@ -296,39 +400,54 @@ func (s *Key) encodeFields(e *jx.Encoder) {
 		s.ModifiedAt.Encode(e)
 	}
 	{
+		if s.ServiceClass.Set {
+			e.FieldStart("ServiceClass")
+			s.ServiceClass.Encode(e)
+		}
+	}
+	{
 		e.FieldStart("Name")
 		e.Str(s.Name)
 	}
 	{
-		if s.Description.Set {
-			e.FieldStart("Description")
-			s.Description.Encode(e)
-		}
+		e.FieldStart("Description")
+		e.Str(s.Description)
 	}
 	{
 		e.FieldStart("KeyOrigin")
 		s.KeyOrigin.Encode(e)
 	}
 	{
-		if s.Tags != nil {
-			e.FieldStart("Tags")
-			e.ArrStart()
-			for _, elem := range s.Tags {
-				e.Str(elem)
-			}
-			e.ArrEnd()
+		if s.LatestVersion.Set {
+			e.FieldStart("LatestVersion")
+			s.LatestVersion.Encode(e)
 		}
+	}
+	{
+		e.FieldStart("Status")
+		s.Status.Encode(e)
+	}
+	{
+		e.FieldStart("Tags")
+		e.ArrStart()
+		for _, elem := range s.Tags {
+			e.Str(elem)
+		}
+		e.ArrEnd()
 	}
 }
 
-var jsonFieldsNameOfKey = [7]string{
+var jsonFieldsNameOfKey = [10]string{
 	0: "ID",
 	1: "CreatedAt",
 	2: "ModifiedAt",
-	3: "Name",
-	4: "Description",
-	5: "KeyOrigin",
-	6: "Tags",
+	3: "ServiceClass",
+	4: "Name",
+	5: "Description",
+	6: "KeyOrigin",
+	7: "LatestVersion",
+	8: "Status",
+	9: "Tags",
 }
 
 // Decode decodes Key from json.
@@ -336,7 +455,7 @@ func (s *Key) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode Key to nil")
 	}
-	var requiredBitSet [1]uint8
+	var requiredBitSet [2]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -372,8 +491,18 @@ func (s *Key) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"ModifiedAt\"")
 			}
+		case "ServiceClass":
+			if err := func() error {
+				s.ServiceClass.Reset()
+				if err := s.ServiceClass.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ServiceClass\"")
+			}
 		case "Name":
-			requiredBitSet[0] |= 1 << 3
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
 				v, err := d.Str()
 				s.Name = string(v)
@@ -385,9 +514,11 @@ func (s *Key) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"Name\"")
 			}
 		case "Description":
+			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
-				s.Description.Reset()
-				if err := s.Description.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Description = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -395,7 +526,7 @@ func (s *Key) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"Description\"")
 			}
 		case "KeyOrigin":
-			requiredBitSet[0] |= 1 << 5
+			requiredBitSet[0] |= 1 << 6
 			if err := func() error {
 				if err := s.KeyOrigin.Decode(d); err != nil {
 					return err
@@ -404,7 +535,28 @@ func (s *Key) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"KeyOrigin\"")
 			}
+		case "LatestVersion":
+			if err := func() error {
+				s.LatestVersion.Reset()
+				if err := s.LatestVersion.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"LatestVersion\"")
+			}
+		case "Status":
+			requiredBitSet[1] |= 1 << 0
+			if err := func() error {
+				if err := s.Status.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Status\"")
+			}
 		case "Tags":
+			requiredBitSet[1] |= 1 << 1
 			if err := func() error {
 				s.Tags = make([]string, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
@@ -432,8 +584,9 @@ func (s *Key) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00101111,
+	for i, mask := range [2]uint8{
+		0b01110111,
+		0b00000011,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -479,6 +632,144 @@ func (s *Key) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode implements json.Marshaler.
+func (s *KeyCipher) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *KeyCipher) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("Cipher")
+		e.Str(s.Cipher)
+	}
+}
+
+var jsonFieldsNameOfKeyCipher = [1]string{
+	0: "Cipher",
+}
+
+// Decode decodes KeyCipher from json.
+func (s *KeyCipher) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode KeyCipher to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "Cipher":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Str()
+				s.Cipher = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Cipher\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode KeyCipher")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfKeyCipher) {
+					name = jsonFieldsNameOfKeyCipher[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *KeyCipher) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *KeyCipher) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes KeyEncryptAlgoEnum as json.
+func (s KeyEncryptAlgoEnum) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes KeyEncryptAlgoEnum from json.
+func (s *KeyEncryptAlgoEnum) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode KeyEncryptAlgoEnum to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch KeyEncryptAlgoEnum(v) {
+	case KeyEncryptAlgoEnumAes256Gcm:
+		*s = KeyEncryptAlgoEnumAes256Gcm
+	case KeyEncryptAlgoEnumAes256Cbc:
+		*s = KeyEncryptAlgoEnumAes256Cbc
+	case KeyEncryptAlgoEnumAes256Kw:
+		*s = KeyEncryptAlgoEnumAes256Kw
+	default:
+		*s = KeyEncryptAlgoEnum(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s KeyEncryptAlgoEnum) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *KeyEncryptAlgoEnum) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes KeyOriginEnum as json.
 func (s KeyOriginEnum) Encode(e *jx.Encoder) {
 	e.Str(string(s))
@@ -519,6 +810,236 @@ func (s *KeyOriginEnum) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode implements json.Marshaler.
+func (s *KeyPlain) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *KeyPlain) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("Plain")
+		e.Str(s.Plain)
+	}
+	{
+		if s.Algo.Set {
+			e.FieldStart("Algo")
+			s.Algo.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfKeyPlain = [2]string{
+	0: "Plain",
+	1: "Algo",
+}
+
+// Decode decodes KeyPlain from json.
+func (s *KeyPlain) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode KeyPlain to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "Plain":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Str()
+				s.Plain = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Plain\"")
+			}
+		case "Algo":
+			if err := func() error {
+				s.Algo.Reset()
+				if err := s.Algo.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Algo\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode KeyPlain")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfKeyPlain) {
+					name = jsonFieldsNameOfKeyPlain[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *KeyPlain) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *KeyPlain) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes KeyServiceClassEnum as json.
+func (s KeyServiceClassEnum) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes KeyServiceClassEnum from json.
+func (s *KeyServiceClassEnum) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode KeyServiceClassEnum to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch KeyServiceClassEnum(v) {
+	case KeyServiceClassEnumCloudKmsKey:
+		*s = KeyServiceClassEnumCloudKmsKey
+	case KeyServiceClassEnumCloudKmsKeyLegacy:
+		*s = KeyServiceClassEnumCloudKmsKeyLegacy
+	default:
+		*s = KeyServiceClassEnum(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s KeyServiceClassEnum) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *KeyServiceClassEnum) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes KeyStatusEnum as json.
+func (s KeyStatusEnum) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes KeyStatusEnum from json.
+func (s *KeyStatusEnum) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode KeyStatusEnum to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch KeyStatusEnum(v) {
+	case KeyStatusEnumActive:
+		*s = KeyStatusEnumActive
+	case KeyStatusEnumRestricted:
+		*s = KeyStatusEnumRestricted
+	case KeyStatusEnumSuspended:
+		*s = KeyStatusEnumSuspended
+	case KeyStatusEnumPendingDestruction:
+		*s = KeyStatusEnumPendingDestruction
+	default:
+		*s = KeyStatusEnum(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s KeyStatusEnum) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *KeyStatusEnum) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes ChangeKeyStatusStatus as json.
+func (o OptChangeKeyStatusStatus) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes ChangeKeyStatusStatus from json.
+func (o *OptChangeKeyStatusStatus) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptChangeKeyStatusStatus to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptChangeKeyStatusStatus) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptChangeKeyStatusStatus) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes int as json.
 func (o OptInt) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -550,6 +1071,72 @@ func (s OptInt) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptInt) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes KeyEncryptAlgoEnum as json.
+func (o OptKeyEncryptAlgoEnum) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes KeyEncryptAlgoEnum from json.
+func (o *OptKeyEncryptAlgoEnum) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptKeyEncryptAlgoEnum to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptKeyEncryptAlgoEnum) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptKeyEncryptAlgoEnum) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes KeyServiceClassEnum as json.
+func (o OptKeyServiceClassEnum) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes KeyServiceClassEnum from json.
+func (o *OptKeyServiceClassEnum) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptKeyServiceClassEnum to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptKeyServiceClassEnum) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptKeyServiceClassEnum) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -747,6 +1334,196 @@ func (s *PaginatedKeyList) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
+func (s *ScheduleDestructionKey) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *ScheduleDestructionKey) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("PendingDays")
+		e.Int(s.PendingDays)
+	}
+}
+
+var jsonFieldsNameOfScheduleDestructionKey = [1]string{
+	0: "PendingDays",
+}
+
+// Decode decodes ScheduleDestructionKey from json.
+func (s *ScheduleDestructionKey) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ScheduleDestructionKey to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "PendingDays":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Int()
+				s.PendingDays = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"PendingDays\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode ScheduleDestructionKey")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfScheduleDestructionKey) {
+					name = jsonFieldsNameOfScheduleDestructionKey[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *ScheduleDestructionKey) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ScheduleDestructionKey) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *WrappedChangeKeyStatus) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *WrappedChangeKeyStatus) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("Key")
+		s.Key.Encode(e)
+	}
+}
+
+var jsonFieldsNameOfWrappedChangeKeyStatus = [1]string{
+	0: "Key",
+}
+
+// Decode decodes WrappedChangeKeyStatus from json.
+func (s *WrappedChangeKeyStatus) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode WrappedChangeKeyStatus to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "Key":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				if err := s.Key.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Key\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode WrappedChangeKeyStatus")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfWrappedChangeKeyStatus) {
+					name = jsonFieldsNameOfWrappedChangeKeyStatus[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *WrappedChangeKeyStatus) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *WrappedChangeKeyStatus) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s *WrappedCreateKey) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -930,6 +1707,288 @@ func (s *WrappedKey) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *WrappedKey) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *WrappedKeyCipher) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *WrappedKeyCipher) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("Key")
+		s.Key.Encode(e)
+	}
+}
+
+var jsonFieldsNameOfWrappedKeyCipher = [1]string{
+	0: "Key",
+}
+
+// Decode decodes WrappedKeyCipher from json.
+func (s *WrappedKeyCipher) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode WrappedKeyCipher to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "Key":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				if err := s.Key.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Key\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode WrappedKeyCipher")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfWrappedKeyCipher) {
+					name = jsonFieldsNameOfWrappedKeyCipher[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *WrappedKeyCipher) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *WrappedKeyCipher) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *WrappedKeyPlain) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *WrappedKeyPlain) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("Key")
+		s.Key.Encode(e)
+	}
+}
+
+var jsonFieldsNameOfWrappedKeyPlain = [1]string{
+	0: "Key",
+}
+
+// Decode decodes WrappedKeyPlain from json.
+func (s *WrappedKeyPlain) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode WrappedKeyPlain to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "Key":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				if err := s.Key.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Key\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode WrappedKeyPlain")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfWrappedKeyPlain) {
+					name = jsonFieldsNameOfWrappedKeyPlain[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *WrappedKeyPlain) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *WrappedKeyPlain) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *WrappedScheduleDestructionKey) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *WrappedScheduleDestructionKey) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("Key")
+		s.Key.Encode(e)
+	}
+}
+
+var jsonFieldsNameOfWrappedScheduleDestructionKey = [1]string{
+	0: "Key",
+}
+
+// Decode decodes WrappedScheduleDestructionKey from json.
+func (s *WrappedScheduleDestructionKey) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode WrappedScheduleDestructionKey to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "Key":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				if err := s.Key.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Key\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode WrappedScheduleDestructionKey")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfWrappedScheduleDestructionKey) {
+					name = jsonFieldsNameOfWrappedScheduleDestructionKey[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *WrappedScheduleDestructionKey) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *WrappedScheduleDestructionKey) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

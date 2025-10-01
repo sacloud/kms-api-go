@@ -3,6 +3,20 @@
 package v1
 
 // SetFake set fake values.
+func (s *ChangeKeyStatus) SetFake() {
+	{
+		{
+			s.Status.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *ChangeKeyStatusStatus) SetFake() {
+	*s = ChangeKeyStatusStatusActive
+}
+
+// SetFake set fake values.
 func (s *CreateKey) SetFake() {
 	{
 		{
@@ -81,17 +95,32 @@ func (s *Key) SetFake() {
 	}
 	{
 		{
+			s.ServiceClass.SetFake()
+		}
+	}
+	{
+		{
 			s.Name = "string"
 		}
 	}
 	{
 		{
-			s.Description.SetFake()
+			s.Description = "string"
 		}
 	}
 	{
 		{
 			s.KeyOrigin.SetFake()
+		}
+	}
+	{
+		{
+			s.LatestVersion.SetFake()
+		}
+	}
+	{
+		{
+			s.Status.SetFake()
 		}
 	}
 	{
@@ -109,8 +138,55 @@ func (s *Key) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *KeyCipher) SetFake() {
+	{
+		{
+			s.Cipher = "string"
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *KeyEncryptAlgoEnum) SetFake() {
+	*s = KeyEncryptAlgoEnumAes256Gcm
+}
+
+// SetFake set fake values.
 func (s *KeyOriginEnum) SetFake() {
 	*s = KeyOriginEnumGenerated
+}
+
+// SetFake set fake values.
+func (s *KeyPlain) SetFake() {
+	{
+		{
+			s.Plain = "string"
+		}
+	}
+	{
+		{
+			s.Algo.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *KeyServiceClassEnum) SetFake() {
+	*s = KeyServiceClassEnumCloudKmsKey
+}
+
+// SetFake set fake values.
+func (s *KeyStatusEnum) SetFake() {
+	*s = KeyStatusEnumActive
+}
+
+// SetFake set fake values.
+func (s *OptChangeKeyStatusStatus) SetFake() {
+	var elem ChangeKeyStatusStatus
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
 }
 
 // SetFake set fake values.
@@ -118,6 +194,24 @@ func (s *OptInt) SetFake() {
 	var elem int
 	{
 		elem = int(0)
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
+func (s *OptKeyEncryptAlgoEnum) SetFake() {
+	var elem KeyEncryptAlgoEnum
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
+func (s *OptKeyServiceClassEnum) SetFake() {
+	var elem KeyServiceClassEnum
+	{
+		elem.SetFake()
 	}
 	s.SetTo(elem)
 }
@@ -163,6 +257,24 @@ func (s *PaginatedKeyList) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *ScheduleDestructionKey) SetFake() {
+	{
+		{
+			s.PendingDays = int(0)
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *WrappedChangeKeyStatus) SetFake() {
+	{
+		{
+			s.Key.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
 func (s *WrappedCreateKey) SetFake() {
 	{
 		{
@@ -173,6 +285,33 @@ func (s *WrappedCreateKey) SetFake() {
 
 // SetFake set fake values.
 func (s *WrappedKey) SetFake() {
+	{
+		{
+			s.Key.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *WrappedKeyCipher) SetFake() {
+	{
+		{
+			s.Key.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *WrappedKeyPlain) SetFake() {
+	{
+		{
+			s.Key.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *WrappedScheduleDestructionKey) SetFake() {
 	{
 		{
 			s.Key.SetFake()

@@ -7,12 +7,67 @@ import (
 	"net/http"
 
 	"github.com/go-faster/jx"
-
 	ht "github.com/ogen-go/ogen/http"
 )
 
 func encodeKmsKeysCreateRequest(
 	req *WrappedCreateKey,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeKmsKeysDecryptRequest(
+	req *WrappedKeyCipher,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeKmsKeysEncryptRequest(
+	req *WrappedKeyPlain,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeKmsKeysScheduleDestructionRequest(
+	req *WrappedScheduleDestructionKey,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeKmsKeysStatusRequest(
+	req *WrappedChangeKeyStatus,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
