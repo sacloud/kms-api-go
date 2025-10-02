@@ -109,7 +109,7 @@ func (op *keyOp) Rotate(ctx context.Context, id string) (*v1.Key, error) {
 
 func (op *keyOp) ChangeStatus(ctx context.Context, id string, status v1.ChangeKeyStatusStatus) error {
 	err := op.client.KmsKeysStatus(ctx, &v1.WrappedChangeKeyStatus{
-		Key: v1.ChangeKeyStatus{Status: v1.NewOptChangeKeyStatusStatus(v1.ChangeKeyStatusStatus(status))},
+		Key: v1.ChangeKeyStatus{Status: v1.NewOptChangeKeyStatusStatus(status)},
 	}, v1.KmsKeysStatusParams{ResourceID: id})
 	if err != nil {
 		return createAPIError("Key.ChangeStatus", err)
@@ -136,7 +136,7 @@ func (op *keyOp) ScheduleDestruction(ctx context.Context, id string, days int) e
 func (op *keyOp) Encrypt(ctx context.Context, id string, plain []byte, algo v1.KeyEncryptAlgoEnum) (string, error) {
 	// APIドキュメントではAlgoはRequiredになっていないが、実際にはwriteOnlyの必須フィールドとなっている
 	res, err := op.client.KmsKeysEncrypt(ctx, &v1.WrappedKeyPlain{
-		Key: v1.KeyPlain{Plain: base64.StdEncoding.EncodeToString([]byte(plain)), Algo: v1.NewOptKeyEncryptAlgoEnum(algo)},
+		Key: v1.KeyPlain{Plain: base64.StdEncoding.EncodeToString(plain), Algo: v1.NewOptKeyEncryptAlgoEnum(algo)},
 	}, v1.KmsKeysEncryptParams{ResourceID: id})
 	if err != nil {
 		return "", createAPIError("Key.Encrypt", err)
