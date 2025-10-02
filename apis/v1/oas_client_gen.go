@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/go-faster/errors"
-
 	"github.com/ogen-go/ogen/conv"
 	ht "github.com/ogen-go/ogen/http"
 	"github.com/ogen-go/ogen/ogenerrors"
@@ -26,10 +25,18 @@ type Invoker interface {
 	//
 	// POST /kms/keys
 	KmsKeysCreate(ctx context.Context, request *WrappedCreateKey) (*WrappedCreateKey, error)
+	// KmsKeysDecrypt invokes kms_keys_decrypt operation.
+	//
+	// POST /kms/keys/{resource_id}/decrypt
+	KmsKeysDecrypt(ctx context.Context, request *WrappedKeyCipher, params KmsKeysDecryptParams) (*WrappedKeyPlain, error)
 	// KmsKeysDestroy invokes kms_keys_destroy operation.
 	//
 	// DELETE /kms/keys/{resource_id}
 	KmsKeysDestroy(ctx context.Context, params KmsKeysDestroyParams) error
+	// KmsKeysEncrypt invokes kms_keys_encrypt operation.
+	//
+	// POST /kms/keys/{resource_id}/encrypt
+	KmsKeysEncrypt(ctx context.Context, request *WrappedKeyPlain, params KmsKeysEncryptParams) (*WrappedKeyCipher, error)
 	// KmsKeysList invokes kms_keys_list operation.
 	//
 	// GET /kms/keys
@@ -38,6 +45,18 @@ type Invoker interface {
 	//
 	// GET /kms/keys/{resource_id}
 	KmsKeysRetrieve(ctx context.Context, params KmsKeysRetrieveParams) (*WrappedKey, error)
+	// KmsKeysRotate invokes kms_keys_rotate operation.
+	//
+	// POST /kms/keys/{resource_id}/rotate
+	KmsKeysRotate(ctx context.Context, params KmsKeysRotateParams) (KmsKeysRotateRes, error)
+	// KmsKeysScheduleDestruction invokes kms_keys_schedule_destruction operation.
+	//
+	// POST /kms/keys/{resource_id}/schedule-destruction
+	KmsKeysScheduleDestruction(ctx context.Context, request *WrappedScheduleDestructionKey, params KmsKeysScheduleDestructionParams) error
+	// KmsKeysStatus invokes kms_keys_status operation.
+	//
+	// POST /kms/keys/{resource_id}/status
+	KmsKeysStatus(ctx context.Context, request *WrappedChangeKeyStatus, params KmsKeysStatusParams) error
 	// KmsKeysUpdate invokes kms_keys_update operation.
 	//
 	// PUT /kms/keys/{resource_id}
@@ -164,6 +183,95 @@ func (c *Client) sendKmsKeysCreate(ctx context.Context, request *WrappedCreateKe
 	return result, nil
 }
 
+// KmsKeysDecrypt invokes kms_keys_decrypt operation.
+//
+// POST /kms/keys/{resource_id}/decrypt
+func (c *Client) KmsKeysDecrypt(ctx context.Context, request *WrappedKeyCipher, params KmsKeysDecryptParams) (*WrappedKeyPlain, error) {
+	res, err := c.sendKmsKeysDecrypt(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendKmsKeysDecrypt(ctx context.Context, request *WrappedKeyCipher, params KmsKeysDecryptParams) (res *WrappedKeyPlain, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/kms/keys/"
+	{
+		// Encode "resource_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "resource_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ResourceID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/decrypt"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeKmsKeysDecryptRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityBasicAuth(ctx, KmsKeysDecryptOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"BasicAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeKmsKeysDecryptResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // KmsKeysDestroy invokes kms_keys_destroy operation.
 //
 // DELETE /kms/keys/{resource_id}
@@ -242,6 +350,104 @@ func (c *Client) sendKmsKeysDestroy(ctx context.Context, params KmsKeysDestroyPa
 	defer resp.Body.Close()
 
 	result, err := decodeKmsKeysDestroyResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// KmsKeysEncrypt invokes kms_keys_encrypt operation.
+//
+// POST /kms/keys/{resource_id}/encrypt
+func (c *Client) KmsKeysEncrypt(ctx context.Context, request *WrappedKeyPlain, params KmsKeysEncryptParams) (*WrappedKeyCipher, error) {
+	res, err := c.sendKmsKeysEncrypt(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendKmsKeysEncrypt(ctx context.Context, request *WrappedKeyPlain, params KmsKeysEncryptParams) (res *WrappedKeyCipher, err error) {
+	// Validate request before sending.
+	if err := func() error {
+		if err := request.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return res, errors.Wrap(err, "validate")
+	}
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/kms/keys/"
+	{
+		// Encode "resource_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "resource_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ResourceID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/encrypt"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeKmsKeysEncryptRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityBasicAuth(ctx, KmsKeysEncryptOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"BasicAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeKmsKeysEncryptResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -394,6 +600,279 @@ func (c *Client) sendKmsKeysRetrieve(ctx context.Context, params KmsKeysRetrieve
 	defer resp.Body.Close()
 
 	result, err := decodeKmsKeysRetrieveResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// KmsKeysRotate invokes kms_keys_rotate operation.
+//
+// POST /kms/keys/{resource_id}/rotate
+func (c *Client) KmsKeysRotate(ctx context.Context, params KmsKeysRotateParams) (KmsKeysRotateRes, error) {
+	res, err := c.sendKmsKeysRotate(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendKmsKeysRotate(ctx context.Context, params KmsKeysRotateParams) (res KmsKeysRotateRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/kms/keys/"
+	{
+		// Encode "resource_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "resource_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ResourceID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/rotate"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityBasicAuth(ctx, KmsKeysRotateOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"BasicAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeKmsKeysRotateResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// KmsKeysScheduleDestruction invokes kms_keys_schedule_destruction operation.
+//
+// POST /kms/keys/{resource_id}/schedule-destruction
+func (c *Client) KmsKeysScheduleDestruction(ctx context.Context, request *WrappedScheduleDestructionKey, params KmsKeysScheduleDestructionParams) error {
+	_, err := c.sendKmsKeysScheduleDestruction(ctx, request, params)
+	return err
+}
+
+func (c *Client) sendKmsKeysScheduleDestruction(ctx context.Context, request *WrappedScheduleDestructionKey, params KmsKeysScheduleDestructionParams) (res *KmsKeysScheduleDestructionOK, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/kms/keys/"
+	{
+		// Encode "resource_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "resource_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ResourceID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/schedule-destruction"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeKmsKeysScheduleDestructionRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityBasicAuth(ctx, KmsKeysScheduleDestructionOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"BasicAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeKmsKeysScheduleDestructionResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// KmsKeysStatus invokes kms_keys_status operation.
+//
+// POST /kms/keys/{resource_id}/status
+func (c *Client) KmsKeysStatus(ctx context.Context, request *WrappedChangeKeyStatus, params KmsKeysStatusParams) error {
+	_, err := c.sendKmsKeysStatus(ctx, request, params)
+	return err
+}
+
+func (c *Client) sendKmsKeysStatus(ctx context.Context, request *WrappedChangeKeyStatus, params KmsKeysStatusParams) (res *KmsKeysStatusOK, err error) {
+	// Validate request before sending.
+	if err := func() error {
+		if err := request.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return res, errors.Wrap(err, "validate")
+	}
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/kms/keys/"
+	{
+		// Encode "resource_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "resource_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ResourceID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/status"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeKmsKeysStatusRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityBasicAuth(ctx, KmsKeysStatusOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"BasicAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeKmsKeysStatusResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

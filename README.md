@@ -38,6 +38,12 @@ func main() {
 		panic(err)
 	}
 	fmt.Println(res.Name)
+
+	cipher, err := keyOp.Encrypt(ctx, res.ID, []byte("hello world!"), v1.KeyEncryptAlgoEnumAes256Gcm)
+	plain, err := keyOp.Decrypt(ctx, res.ID, cipher)
+	// plain is "hello world!"
+
+	// Read / Update / Delete / Rotate / ChangeStatus and more...
 }
 ```
 
