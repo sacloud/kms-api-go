@@ -31,7 +31,7 @@ type KeyAPI interface {
 
 	Rotate(ctx context.Context, id string) (*v1.Key, error)
 	ChangeStatus(ctx context.Context, id string, status v1.ChangeKeyStatusStatus) error
-	ScheduleDestruction(ctx context.Context, id string, days int) error
+	ScheduleDestruction(ctx context.Context, id string, pendingDays int) error
 
 	Encrypt(ctx context.Context, id string, plain []byte, algo v1.KeyEncryptAlgoEnum) (string, error)
 	Decrypt(ctx context.Context, id, cipher string) ([]byte, error)
@@ -117,15 +117,13 @@ func (op *keyOp) ChangeStatus(ctx context.Context, id string, status v1.ChangeKe
 	return nil
 }
 
-func (op *keyOp) ScheduleDestruction(ctx context.Context, id string, days int) error {
-	/* 猶予日数のAPIドキュメントに修正が必要なので、修正されるまでコメントアウト
-	if days < 7 || days > 14 {
-		return NewError("Key.ScheduleDestruction", errors.New("days must be between 7 and 14 days"))
+func (op *keyOp) ScheduleDestruction(ctx context.Context, id string, pendingDays int) error {
+	if pendingDays < 7 || pendingDays > 90 {
+		return NewError("Key.ScheduleDestruction", errors.New("pending days must be between 7 and 90 days"))
 	}
-	*/
 
 	err := op.client.KmsKeysScheduleDestruction(ctx, &v1.WrappedScheduleDestructionKey{
-		Key: v1.ScheduleDestructionKey{PendingDays: days},
+		Key: v1.ScheduleDestructionKey{PendingDays: pendingDays},
 	}, v1.KmsKeysScheduleDestructionParams{ResourceID: id})
 	if err != nil {
 		return createAPIError("Key.ScheduleDestruction", err)

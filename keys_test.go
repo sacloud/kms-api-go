@@ -81,6 +81,9 @@ func TestKeyAPI(t *testing.T) {
 	assert.Equal(t, v1.KeyStatusEnumSuspended, read.Status)
 	assert.Equal(t, 1, read.LatestVersion.Value)
 
+	err = keyOp.ScheduleDestruction(ctx, resCreate.ID, 100)
+	assert.Error(t, err, "schedule destruction: longer pending days must be an error")
+
 	err = keyOp.ScheduleDestruction(ctx, resCreate.ID, 10)
 	assert.NoError(t, err, "failed to schedule destruction")
 
