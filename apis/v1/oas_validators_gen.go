@@ -251,6 +251,8 @@ func (s KeyStatusEnum) Validate() error {
 		return nil
 	case "pending_destruction":
 		return nil
+	case "": // StatusはreadOnlyなため、リクエストで無視するために空文字を許容
+		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
 	}
