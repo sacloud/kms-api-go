@@ -1,5 +1,14 @@
 # Changelog
 
+## [v0.3.0](https://github.com/sacloud/kms-api-go/compare/v0.2.2...v0.3.0) - 2025-10-02
+- ci: bump actions/checkout from 4 to 5 by @dependabot[bot] in https://github.com/sacloud/kms-api-go/pull/10
+- go: bump github.com/sacloud/api-client-go from 0.3.2 to 0.3.3 by @dependabot[bot] in https://github.com/sacloud/kms-api-go/pull/11
+- Update github settings by @repeatedly in https://github.com/sacloud/kms-api-go/pull/16
+- Update golangci-lint / textlint version by @repeatedly in https://github.com/sacloud/kms-api-go/pull/20
+- Update OpenAPI and support new APIs by @repeatedly in https://github.com/sacloud/kms-api-go/pull/21
+- ci: bump Songmu/tagpr from 1.8.4 to 1.9.0 by @dependabot[bot] in https://github.com/sacloud/kms-api-go/pull/18
+- go: bump github.com/stretchr/testify from 1.10.0 to 1.11.1 by @dependabot[bot] in https://github.com/sacloud/kms-api-go/pull/13
+
 ## [v0.2.2](https://github.com/sacloud/kms-api-go/compare/v0.2.1...v0.2.2) - 2025-07-07
 - NewClient functions accept client parameters by @repeatedly in https://github.com/sacloud/kms-api-go/pull/8
 
