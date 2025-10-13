@@ -7,7 +7,7 @@ tool github.com/ogen-go/ogen/cmd/ogen
 require (
 	github.com/go-faster/errors v0.7.1
 	github.com/go-faster/jx v1.1.0
-	github.com/ogen-go/ogen v1.15.1
+	github.com/ogen-go/ogen v1.16.0
 	github.com/sacloud/api-client-go v0.3.3
 	github.com/sacloud/packages-go v0.0.11
 	github.com/stretchr/testify v1.11.1
@@ -28,6 +28,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sacloud/go-http v0.1.9 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
+	github.com/shopspring/decimal v1.4.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/ratelimit v0.3.1 // indirect
 	go.uber.org/zap v1.27.0 // indirect
