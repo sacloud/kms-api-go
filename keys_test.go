@@ -14,7 +14,7 @@ import (
 )
 
 func TestKeyAPI(t *testing.T) {
-	testutil.PreCheckEnvsFunc("SAKURACLOUD_ACCESS_TOKEN", "SAKURACLOUD_ACCESS_TOKEN_SECRET")(t)
+	testutil.PreCheckEnvsFunc("SAKURA_ACCESS_TOKEN", "SAKURA_ACCESS_TOKEN_SECRET")(t)
 
 	client, err := kms.NewClient(client.WithDisableProfile(true))
 	require.NoError(t, err, "failed to create client")
