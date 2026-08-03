@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.4.1](https://github.com/sacloud/kms-api-go/compare/v0.4.0...v0.4.1) - 2026-08-03
+- update README for repository transition by @shyouhei in https://github.com/sacloud/kms-api-go/pull/63
+
 ## [v0.4.0](https://github.com/sacloud/kms-api-go/compare/v0.3.1...v0.4.0) - 2026-02-16
 - ci: bump actions/checkout from 6.0.1 to 6.0.2 by @dependabot[bot] in https://github.com/sacloud/kms-api-go/pull/37
 - ci: bump actions/setup-go from 6.1.0 to 6.2.0 by @dependabot[bot] in https://github.com/sacloud/kms-api-go/pull/36
