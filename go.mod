@@ -2,9 +2,7 @@
 // Please migrate to that module. This repository will be archived.
 module github.com/sacloud/kms-api-go
 
-go 1.25.0
-
-toolchain go1.25.7
+go 1.25.8
 
 tool github.com/ogen-go/ogen/cmd/ogen
 
@@ -12,7 +10,7 @@ require (
 	github.com/go-faster/errors v0.7.1
 	github.com/go-faster/jx v1.1.0
 	github.com/ogen-go/ogen v1.15.1
-	github.com/sacloud/packages-go v0.0.12
+	github.com/sacloud/packages-go v0.0.13
 	github.com/sacloud/saclient-go v0.3.1
 	github.com/stretchr/testify v1.11.1
 )
@@ -39,12 +37,12 @@ require (
 	go.uber.org/ratelimit v0.3.1 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6 // indirect
-	golang.org/x/mod v0.28.0 // indirect
-	golang.org/x/net v0.44.0 // indirect
-	golang.org/x/sync v0.17.0 // indirect
-	golang.org/x/sys v0.37.0 // indirect
-	golang.org/x/text v0.29.0 // indirect
-	golang.org/x/tools v0.37.0 // indirect
+	golang.org/x/mod v0.35.0 // indirect
+	golang.org/x/net v0.52.0 // indirect
+	golang.org/x/sync v0.20.0 // indirect
+	golang.org/x/sys v0.42.0 // indirect
+	golang.org/x/text v0.35.0 // indirect
+	golang.org/x/tools v0.43.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
